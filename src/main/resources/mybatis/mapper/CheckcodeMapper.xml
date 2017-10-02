@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.blank.manage.mapper.CheckcodeMapper">
+
+    <resultMap id="BaseResultMap" type="com.blank.manage.domain.Checkcode">
+        <result property="id" column="id"/>
+        <result property="mobile" column="mobile"/>
+        <result property="code" column="code"/>
+        <result property="ip" column="ip"/>
+        <result property="status" column="status"/>
+        <result property="expireAt" column="expireAt"/>
+        <result property="used" column="used"/>
+        <result property="usingAt" column="usingAt"/>
+        <result property="createtime" column="createtime"/>
+    </resultMap>
+    <sql id="columns">
+        <![CDATA[
+            id,mobile,code,ip,status,expireAt,used,usingAt,createtime
+            ]]>
+    </sql>
+
+    <insert id="insertSingle" useGeneratedKeys="true" keyProperty="id" parameterType="com.blank.manage.domain.Checkcode">
+        <![CDATA[
+            INSERT INTO checkcode (
+             mobile, code, ip, status, expireAt, used, usingAt, createtime
+            ) VALUES (
+             #{mobile}, #{code}, #{ip}, #{status}, #{expireAt}, #{used}, #{usingAt}, #{createtime}
+            )
+        ]]>
+    </insert>
+
+    <select id="findCountIn90Second" resultType="Integer">
+        SELECT COUNT(*) FROM checkcode WHERE mobile = #{mobile} AND expireAt > #{date} AND DATE_ADD(createtime, INTERVAL 90 SECOND) > #{date}
+    </select>
+
+    <select id="findCountIn1DayByMobile" resultType="Integer">
+        SELECT COUNT(*) FROM checkcode WHERE mobile = #{mobile} AND DATE_ADD(createtime, INTERVAL 1 DAY) > #{date}
+    </select>
+
+    <select id="findCountIn1DayByIp" resultType="Integer">
+        SELECT COUNT(*) FROM checkcode WHERE ip = #{ip} AND DATE_ADD(createtime, INTERVAL 1 DAY) > #{date}
+    </select>
+</mapper>

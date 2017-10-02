@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.blank.manage.mapper.MerchantCollectionMapper">
+
+    <resultMap id="BaseResultMap" type="com.blank.manage.domain.MerchantCollection">
+            <result property="id" column="id"/>
+            <result property="merchantType" column="merchant_type"/>
+            <result property="merchantId" column="merchant_id"/>
+            <result property="userId" column="user_id"/>
+            <result property="createTime" column="create_time"/>
+    </resultMap>
+    <sql id="columns">
+    <![CDATA[
+            id,merchant_type,merchant_id,user_id,create_time
+            ]]>
+    </sql>
+
+    <insert id="insert" parameterType="com.blank.manage.domain.MerchantCollection" useGeneratedKeys="true" keyProperty="id">
+            INSERT INTO merchant_collection (
+             merchant_type, merchant_id, user_id, create_time
+            ) VALUES (
+             #{merchantType}, #{merchantId}, #{userId}, #{createTime}
+            )
+    </insert>
+
+    <update id="update" parameterType="com.blank.manage.domain.MerchantCollection">
+    <![CDATA[
+            UPDATE merchant_collection SET
+                merchant_type = #{merchantType} , merchant_id = #{merchantId} , user_id = #{userId} , create_time = #{createTime}  
+            WHERE
+                id = #{id}  
+        ]]>
+    </update>
+
+    <delete id="deleteById">
+    <![CDATA[
+            DELETE FROM merchant_collection WHERE
+            id = #{id} 
+        ]]>
+    </delete>
+
+    <select id="getById" resultType="com.blank.manage.domain.MerchantCollection">
+    SELECT <include refid="columns" />
+    <![CDATA[
+                FROM merchant_collection
+                WHERE
+                    id = #{id} 
+            ]]>
+    </select>
+
+<!--
+                备用查询条件, 注意日期查询条件中,页面元素必须为***Begin和***End
+                -->
+        <!--<if test="null!=id">-->
+        <!--AND id = #{id}-->
+        <!--</if>-->
+        <!--<if test="null!=merchantType">-->
+        <!--AND merchant_type = #{merchantType}-->
+        <!--</if>-->
+        <!--<if test="null!=merchantId">-->
+        <!--AND merchant_id = #{merchantId}-->
+        <!--</if>-->
+        <!--<if test="null!=userId">-->
+        <!--AND user_id = #{userId}-->
+        <!--</if>-->
+        <!--<if test="null!=createTimeBegin">-->
+        <!--AND create_time >= #{createTimeBegin}-->
+        <!--</if>-->
+        <!--<if test="null!=createTimeEnd">-->
+        <!--AND create_time <= #{createTimeEnd}-->
+        <!--</if>-->
+
+    <select id="findAll" resultType="com.blank.manage.domain.MerchantCollection">
+        SELECT <include refid="columns" />
+        FROM merchant_collection
+    </select>
+
+    <select id="findPage" resultType="com.blank.manage.domain.MerchantCollection">
+        SELECT
+            uc.id AS id,
+            merchant_id AS merchantId,
+            merchant_type AS merchantType,
+            COALESCE(s.name, h.name) AS merchantName,
+            COALESCE(s.avatar, h.avatar) AS merchantAvatar,
+            min_price AS minPrice,
+            delivery_price AS deliveryPrice
+        FROM meituan.merchant_collection uc
+        LEFT JOIN meituan.seller s
+            ON uc.merchant_id = s.id AND uc.merchant_type = 'seller'
+        LEFT JOIN meituan.hotel h
+            ON uc.merchant_id = h.id AND uc.merchant_type = 'hotel'
+        WHERE user_id = #{userId}
+    </select>
+
+    <select id="findIdByParams" resultType="Long" parameterType="com.blank.manage.domain.MerchantCollection">
+        SELECT id FROM merchant_collection
+        <where>
+            <if test="null!=merchantType">
+                AND merchant_type = #{merchantType}
+            </if>
+            <if test="null!=merchantId">
+                AND merchant_id = #{merchantId}
+            </if>
+            <if test="null!=userId">
+                AND user_id = #{userId}
+            </if>
+        </where>
+    </select>
+
+    <delete id="deleteByIds">
+        DELETE FROM merchant_collection
+        WHERE id IN
+        <foreach item="item" index="index" collection="ids" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+</mapper>
+

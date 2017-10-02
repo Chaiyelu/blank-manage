@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.blank.manage.mapper.FoodRatingMapper">
+
+    <resultMap id="BaseResultMap" type="com.blank.manage.domain.FoodRating">
+            <result property="id" column="id"/>
+            <result property="sellerId" column="seller_id"/>
+            <result property="userId" column="user_id"/>
+            <result property="foodId" column="food_id"/>
+            <result property="rateTime" column="rate_time"/>
+            <result property="deliveryTime" column="delivery_time"/>
+            <result property="score" column="score"/>
+            <result property="rateType" column="rate_type"/>
+            <result property="text" column="text"/>
+            <result property="status" column="status"/>
+    </resultMap>
+    <sql id="columns">
+    <![CDATA[
+            id,seller_id,user_id,food_id,rate_time,delivery_time,score,rate_type,text,status
+            ]]>
+    </sql>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="com.blank.manage.domain.FoodRating">
+    <![CDATA[
+            INSERT INTO food_rating (
+             seller_id, user_id, food_id, rate_time, delivery_time, score, rate_type, text, status
+            ) VALUES (
+             #{sellerId}, #{userId}, #{foodId}, #{rateTime}, #{deliveryTime}, #{score}, #{rateType}, #{text}, #{status}
+            )
+        ]]>
+    </insert>
+    <update id="update" parameterType="com.blank.manage.domain.FoodRating">
+    <![CDATA[
+            UPDATE food_rating SET
+                seller_id = #{sellerId} , user_id = #{userId} , food_id = #{foodId} , rate_time = #{rateTime} , delivery_time = #{deliveryTime} , score = #{score} , rate_type = #{rateType} , text = #{text} , status = #{status}
+            WHERE
+                id = #{id}
+        ]]>
+    </update>
+
+    <delete id="deleteById">
+    <![CDATA[
+            DELETE FROM food_rating WHERE
+            id = #{id}
+        ]]>
+    </delete>
+
+    <select id="getById" resultType="com.blank.manage.domain.FoodRating">
+    SELECT <include refid="columns" />
+    <![CDATA[
+                FROM food_rating
+                WHERE
+                    id = #{id}
+            ]]>
+    </select>
+
+    <sql id="findPageWhere">
+
+    <where>
+        <if test="null!=searchText">
+        <![CDATA[
+            AND id like '%' || #{searchText} || '%'
+        ]]>
+        </if>
+    </where>
+    </sql>
+<!--
+                备用查询条件, 注意日期查询条件中,页面元素必须为***Begin和***End
+                -->
+        <!--<if test="null!=id">-->
+        <!--AND id = #{id}-->
+        <!--</if>-->
+        <!--<if test="null!=sellerId">-->
+        <!--AND seller_id = #{sellerId}-->
+        <!--</if>-->
+        <!--<if test="null!=userId">-->
+        <!--AND user_id = #{userId}-->
+        <!--</if>-->
+        <!--<if test="null!=foodId">-->
+        <!--AND food_id = #{foodId}-->
+        <!--</if>-->
+        <!--<if test="null!=rateTime">-->
+        <!--AND rate_time = #{rateTime}-->
+        <!--</if>-->
+        <!--<if test="null!=deliveryTime">-->
+        <!--AND delivery_time = #{deliveryTime}-->
+        <!--</if>-->
+        <!--<if test="null!=score">-->
+        <!--AND score = #{score}-->
+        <!--</if>-->
+        <!--<if test="null!=rateType">-->
+        <!--AND rate_type = #{rateType}-->
+        <!--</if>-->
+        <!--<if test="null!=text">-->
+        <!--AND text = #{text}-->
+        <!--</if>-->
+        <!--<if test="null!=status">-->
+        <!--AND status = #{status}-->
+        <!--</if>-->
+
+    <select id="findAll" resultType="com.blank.manage.domain.FoodRating">
+        SELECT <include refid="columns" />
+        FROM food_rating
+    </select>
+
+    <select id="findPage" parameterType="com.blank.manage.domain.FoodRating" resultType="com.blank.manage.domain.FoodRating">
+        SELECT *
+        FROM food_rating
+        <where>
+            <if test="null!=sellerId">
+            AND seller_id = #{sellerId}
+            </if>
+            <if test="null!=userId">
+            AND user_id = #{userId}
+            </if>
+            <if test="null!=foodId">
+            AND food_id = #{foodId}
+            </if>
+            <if test="null!=deliveryTime">
+            AND delivery_time = #{deliveryTime}
+            </if>
+            <if test="null!=score">
+            AND score = #{score}
+            </if>
+            <if test="null!=rateType">
+            AND rate_type = #{rateType}
+            </if>
+        </where>
+    </select>
+
+    <select id="findCountForRateTypeBySellerId" resultType="com.blank.manage.model.CategoryCountResult">
+        SELECT
+            CASE WHEN rate_type=0 THEN '差评' WHEN rate_type=1 THEN '中评' WHEN rate_type=2 THEN '好评' END AS categoryName,
+            COUNT(*) AS categoryCount
+        FROM food_rating
+        WHERE seller_id = 1
+        GROUP BY rate_type
+    </select>
+
+    
+</mapper>
+

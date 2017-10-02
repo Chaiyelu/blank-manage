@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.blank.manage.mapper.UserMapper">
+    <select id="findByMobile" parameterType="String" resultMap="userResultMap">
+        SELECT
+          u.*,
+          r.id as r_id,
+          r.role
+        FROM user u
+        LEFT JOIN user_role ur ON u.id = ur.user_id
+        LEFT JOIN role r ON r.id = ur.role_id
+        WHERE u.mobile = #{mobile}
+    </select>
+
+    <resultMap id="userResultMap" type="User">
+        <id property="id" column="id"></id>
+        <result property="username" column="username"></result>
+        <result property="password" column="password"></result>
+        <result property="mobile" column="mobile"></result>
+        <result property="createtime" column="createtime"></result>
+        <result property="updatetime" column="updatetime"></result>
+        <result property="avatar" column="avatar"></result>
+        <result property="lastPasswordResetDate" column="last_password_reset_date"></result>
+        <collection property="roles" ofType="String">
+            <result property="role" column="role"></result>
+        </collection>
+    </resultMap>
+
+    <insert id="insertSingle" parameterType="User" useGeneratedKeys="true">
+        INSERT INTO user
+          (mobile, username, password, createtime, updatetime, avatar, last_password_reset_date)
+        VALUES
+          (#{mobile}, #{username}, #{password}, #{createtime}, #{updatetime}, #{avatar}, #{lastPasswordResetDate})
+    </insert>
+
+    <select id="findById" resultType="User">
+        SELECT *
+        FROM user
+        WHERE u.id = #{userId}
+    </select>
+
+    <update id="update" parameterType="com.blank.manage.domain.User">
+        <![CDATA[
+            UPDATE user SET
+                mobile = #{mobile} , username = #{username} , birthday = #{birthday} , password = #{password} , token = #{token} , createtime = #{createtime} , updatetime = #{updatetime} , avatar = #{avatar} , status = #{status} , last_password_reset_date = #{lastPasswordResetDate}
+            WHERE
+                id = #{id}
+        ]]>
+    </update>
+</mapper>

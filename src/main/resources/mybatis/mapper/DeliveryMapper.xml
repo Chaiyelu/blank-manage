@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.blank.manage.mapper.DeliveryMapper">
+    <select id="getDeliveryList" parameterType="Delivery" resultType="Delivery">
+        SELECT * FROM delivery
+        <where>
+            <if test="userId != null">
+                user_id = #{userId}
+            </if>
+        </where>
+
+    </select>
+
+    <update id="toggleSelectedByUserId">
+        UPDATE delivery SET selected = #{selected}, updatetime = #{updatetime} WHERE user_id = #{userId} AND selected != #{selected}
+    </update>
+
+    <insert id="insertSingle" parameterType="Delivery">
+        INSERT INTO delivery
+          (consignee, tel, address, area, zipcode, selected, user_id, createtime, updatetime)
+        VALUES
+          (#{consignee}, #{tel}, #{address}, #{area}, #{zipcode}, #{selected}, #{userId}, #{createtime}, #{updatetime})
+    </insert>
+
+    <update id="update" parameterType="com.blank.manage.domain.Delivery">
+    <![CDATA[
+            UPDATE delivery SET
+                consignee = #{consignee} , tel = #{tel} , address = #{address} , area = #{area} , zipcode = #{zipcode} , selected = #{selected} , updatetime = #{updatetime}
+            WHERE
+                id = #{id}  AND  user_id = #{userId}
+        ]]>
+    </update>
+
+    <delete id="deleteByIds">
+        DELETE FROM delivery
+        WHERE id IN
+        <foreach item="item" index="index" collection="ids" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+</mapper>

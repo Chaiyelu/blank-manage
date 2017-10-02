@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.blank.manage.mapper.FoodCategoryMapper" >
+
+    <resultMap type="FoodCategory" id="FoodCategoryAndFood">
+        <id property="id" column="a_id" />
+        <result property="name" column="a_name" />
+
+        <collection property="foods"  ofType="Food">
+            <id property="id" column="b_id" />
+            <result property="name" column="b_name" />
+            <result property="price" column="price" />
+            <result property="oldPrice" column="old_price" />
+            <result property="image" column="image" />
+        </collection>
+    </resultMap>
+
+    <select id="getFoodCategoryAndFoodListBySellerId" parameterType="Long" resultMap="FoodCategoryAndFood">
+        select
+        a.*,
+        b.*,
+        a.id as a_id,
+        a.name as a_name,
+        b.id as b_id,
+        b.name as b_name
+        from
+        food_category a
+        inner join
+        food_category_food m
+        on
+        a.id=m.cate_id
+        inner join
+        food b
+        on
+        m.food_id=b.id
+        <where>
+            <if test="null != sellerId">
+                a.seller_id = #{sellerId}
+            </if>
+        </where>
+    </select>
+
+</mapper>
